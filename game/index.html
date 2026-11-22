@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midnight Vault — a stealth heist game</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d12;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #e8eaf0; }
+  #stage { position: fixed; inset: 0; display: flex; flex-direction: column; }
+  #hud { display: flex; align-items: center; gap: 18px; padding: 8px 14px;
+    background: #14161c; border-bottom: 1px solid #262a35; font-size: 14px; }
+  #hud .alarm-wrap { display: flex; align-items: center; gap: 8px; min-width: 300px; }
+  #alarm-bar { width: 180px; height: 14px; background: #262a35; border-radius: 7px; overflow: hidden; }
+  #alarm-fill { height: 100%; width: 0%; background: #3ecf6e; transition: width 0.2s; }
+  #alarm-text { font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+  #loot-text, #tools-text, #timer-text { white-space: nowrap; }
+  #objective-text { margin-left: auto; color: #ffe9a8; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  #wrap { flex: 1; position: relative; background: #0b0d12; }
+  #game { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px;
+    background: rgba(8, 10, 15, 0.82); text-align: center; padding: 20px; }
+  .screen.hidden, #hud.hidden { display: none; }
+  .screen h1 { margin: 0; font-size: 44px; letter-spacing: 2px; color: #ffd970; }
+  .screen h2 { margin: 0; font-size: 30px; color: #ffd970; }
+  .screen p { margin: 0; max-width: 560px; line-height: 1.55; color: #cfd3dd; }
+  .screen .keys { font-size: 13px; color: #9aa3b2; }
+  .screen button { font-size: 17px; padding: 11px 26px; border: none; border-radius: 8px;
+    background: #ffd970; color: #1a1405; font-weight: 700; cursor: pointer; }
+  .screen button:hover { background: #ffe08f; }
+  #toolbar { display: flex; gap: 8px; padding: 8px 14px; background: #14161c;
+    border-top: 1px solid #262a35; font-size: 13px; align-items: center; }
+  #toolbar .tool { padding: 6px 12px; border: 1px solid #3a3f4a; border-radius: 6px;
+    background: #1d2029; cursor: pointer; }
+  #toolbar .tool:hover { border-color: #ffd970; }
+  #toolbar .hint { margin-left: auto; color: #9aa3b2; }
+  #status { position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="hud">
+    <div class="alarm-wrap"><span id="alarm-text">ALARM 0</span>
+      <div id="alarm-bar"><div id="alarm-fill"></div></div></div>
+    <span id="loot-text">LOOT $0 / $2750</span>
+    <span id="tools-text">CHARGES 2 · 1 Lockpick  2 EMP  3 Smoke  4 Coin</span>
+    <span id="timer-text">TIME 0:00</span>
+    <span id="objective-text">Steal the Star of Meridia, then escape to the van.</span>
+  </div>
+  <div id="wrap">
+    <canvas id="game" aria-label="Midnight Vault: top-down stealth heist game"></canvas>
+    <p id="status" role="status" aria-live="polite"></p>
+    <div id="title-screen" class="screen">
+      <h1>MIDNIGHT VAULT</h1>
+      <p>One thief. One museum. Three zones, five guards, four cameras, a
+      laser hall — and the Star of Meridia waiting in the vault. Grab the
+      loot, crack the safe, and reach the getaway van before the alarm
+      locks the building down.</p>
+      <p class="keys">WASD / arrows — move &nbsp;·&nbsp; Shift — sneak &nbsp;·&nbsp; E — loot / pick lock / crack vault
+        &nbsp;·&nbsp; 1–4 — tools (lockpick, EMP, smoke, coin) &nbsp;·&nbsp; P — pause &nbsp;·&nbsp; M — mute</p>
+      <button id="start-btn">Start the heist</button>
+    </div>
+    <div id="pause-screen" class="screen hidden">
+      <h2>Paused</h2>
+      <p>The guards wait. The lasers keep blinking.</p>
+      <button id="resume-btn">Resume</button>
+    </div>
+    <div id="win-screen" class="screen hidden">
+      <h2>Clean getaway!</h2>
+      <p id="win-stats"></p>
+      <p>The Star of Meridia is gone, and so are you. The museum will not
+        notice until morning.</p>
+      <button id="restart-btn">Heist again</button>
+    </div>
+    <div id="busted-screen" class="screen hidden">
+      <h2>Busted!</h2>
+      <p id="busted-reason"></p>
+      <p>The guards walk you out in cuffs. The vault keeps its secret —
+        this time.</p>
+      <button id="retry-btn">Try again</button>
+    </div>
+  </div>
+  <div id="toolbar">
+    <span class="tool" id="tool-lockpick">1 · Lockpick</span>
+    <span class="tool" id="tool-emp">2 · EMP</span>
+    <span class="tool" id="tool-smoke">3 · Smoke</span>
+    <span class="tool" id="tool-coin">4 · Coin</span>
+    <span class="hint">Click a tool or press 1–4 · E interacts · Shift sneaks</span>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
